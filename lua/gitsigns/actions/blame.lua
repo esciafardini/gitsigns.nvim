@@ -499,6 +499,11 @@ function M.blame(opts)
     once = true,
     callback = function()
       if api.nvim_win_is_valid(blm_win) then
+        -- Reset winfixbuf before closing, in case the window can't be closed
+        -- (e.g., it's the last window) and remains with winfixbuf set
+        if vim.fn.exists('&winfixbuf') == 1 then
+          vim.wo[blm_win].winfixbuf = false
+        end
         api.nvim_win_close(blm_win, true)
       end
     end,
@@ -528,9 +533,25 @@ function M.blame(opts)
   api.nvim_create_autocmd('WinResized', {
     buffer = blm_bufnr,
     group = group,
+
     callback = function()
-      local min_time, max_time = assert(cache[bufnr]):get_blame_times()
-      update_right_extmarks(blm_bufnr, blm_win, blame.entries, min_time, max_time)
+
+      local buf_exists = vim.api.nvim_buf_is_valid(bufnr)
+
+      if buf_exists then
+        local min_time, max_time = assert(cache[bufnr]):get_blame_times()
+        update_right_extmarks(blm_bufnr, blm_win, blame.entries, min_time, max_time)
+      else
+        -- Reset winfixbuf before deleting buffer, in case this window remains
+        if api.nvim_win_is_valid(blm_win) and vim.fn.exists('&winfixbuf') == 1 then
+          vim.wo[blm_win].winfixbuf = false
+        end
+        api.nvim_buf_clear_namespace(blm_bufnr, ns_hl, 0, -1)
+        vim.api.nvim_buf_delete(blm_bufnr, { force = true })
+        if api.nvim_win_is_valid(win) then
+          cur_wlo.foldenable, cur_wlo.scrollbind, cur_wlo.wrap = unpack(cur_orig_wlo)
+        end
+      end
     end,
   })
 
