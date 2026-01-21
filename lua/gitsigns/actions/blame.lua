@@ -387,6 +387,11 @@ function M.blame(opts)
   bcache:get_blame(lnum, opts)
   local blame = assert(bcache.blame)
 
+  if not blame.entries or vim.tbl_isempty(blame.entries) then
+    vim.notify('No blame information available', vim.log.levels.WARN)
+    return
+  end
+
   -- Save position to align 'scrollbind'
   local top = vim.fn.line('w0') + vim.wo.scrolloff
   local current = vim.fn.line('.')
