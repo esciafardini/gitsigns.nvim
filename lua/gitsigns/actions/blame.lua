@@ -534,6 +534,11 @@ function M.blame(opts)
     group = group,
     once = true,
     callback = function()
+      -- Clear highlights on main buffer
+      if api.nvim_buf_is_valid(bufnr) then
+        api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+        api.nvim_buf_clear_namespace(bufnr, ns_hl, 0, -1)
+      end
       if api.nvim_win_is_valid(blm_win) then
         -- Reset winfixbuf before closing, in case the window can't be closed
         -- (e.g., it's the last window) and remains with winfixbuf set
@@ -549,8 +554,17 @@ function M.blame(opts)
     buffer = blm_bufnr,
     group = group,
     callback = function()
-      api.nvim_buf_clear_namespace(blm_bufnr, ns_hl, 0, -1)
+      if api.nvim_buf_is_valid(blm_bufnr) then
+        api.nvim_buf_clear_namespace(blm_bufnr, ns_hl, 0, -1)
+      end
       if api.nvim_buf_is_valid(bufnr) then
+        api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+        api.nvim_buf_clear_namespace(bufnr, ns_hl, 0, -1)
+      end
+    end,
+  })
+      if api.nvim_buf_is_valid(bufnr) then
+        api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
         api.nvim_buf_clear_namespace(bufnr, ns_hl, 0, -1)
       end
     end,
