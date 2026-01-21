@@ -483,6 +483,37 @@ function M.blame(opts)
     buffer = blm_bufnr,
   })
 
+  -- Get sorted list of commit start lines for j/k navigation
+  local commit_line_list = vim.tbl_keys(commit_lines)
+  table.sort(commit_line_list)
+
+  vim.keymap.set('n', 'j', function()
+    local cur = api.nvim_win_get_cursor(blm_win)[1]
+    for _, lnum in ipairs(commit_line_list) do
+      if lnum > cur then
+        api.nvim_win_set_cursor(blm_win, { lnum, 0 })
+        return
+      end
+    end
+  end, {
+    desc = 'Next commit',
+    buffer = blm_bufnr,
+  })
+
+  vim.keymap.set('n', 'k', function()
+    local cur = api.nvim_win_get_cursor(blm_win)[1]
+    for i = #commit_line_list, 1, -1 do
+      local lnum = commit_line_list[i]
+      if lnum < cur then
+        api.nvim_win_set_cursor(blm_win, { lnum, 0 })
+        return
+      end
+    end
+  end, {
+    desc = 'Previous commit',
+    buffer = blm_bufnr,
+  })
+
   menu('GitsignsBlame', {
     { 'Reblame at commit', 'r' },
     { 'Reblame at commit parent', 'R' },
