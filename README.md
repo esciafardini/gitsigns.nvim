@@ -1,4 +1,5 @@
 # gitsigns.nvim
+testing commit
 
 [![CI](https://github.com/lewis6991/gitsigns.nvim/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/lewis6991/gitsigns.nvim/actions?query=workflow%3ACI)
 [![Version](https://img.shields.io/github/v/release/lewis6991/gitsigns.nvim)](https://github.com/lewis6991/gitsigns.nvim/releases)
