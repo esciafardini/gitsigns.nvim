@@ -563,9 +563,18 @@ function M.blame(opts)
       end
     end,
   })
+
+  -- Clean up when blame window is closed (e.g., <C-w>o from main window)
+  api.nvim_create_autocmd('WinClosed', {
+    pattern = tostring(blm_win),
+    group = group,
+    callback = function()
       if api.nvim_buf_is_valid(bufnr) then
         api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
         api.nvim_buf_clear_namespace(bufnr, ns_hl, 0, -1)
+      end
+      if api.nvim_win_is_valid(win) then
+        cur_wlo.foldenable, cur_wlo.scrollbind, cur_wlo.wrap = unpack(cur_orig_wlo)
       end
     end,
   })
@@ -601,17 +610,6 @@ function M.blame(opts)
         if api.nvim_win_is_valid(win) then
           cur_wlo.foldenable, cur_wlo.scrollbind, cur_wlo.wrap = unpack(cur_orig_wlo)
         end
-      end
-    end,
-  })
-
-  api.nvim_create_autocmd('WinClosed', {
-    pattern = tostring(blm_win),
-    group = group,
-    callback = function()
-      api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-      if api.nvim_win_is_valid(win) then
-        cur_wlo.foldenable, cur_wlo.scrollbind, cur_wlo.wrap = unpack(cur_orig_wlo)
       end
     end,
   })
