@@ -320,7 +320,7 @@ M.attach = throttle_async({ hash = 1 }, function(cbuf, ctx, aucmd)
   end
 
   if not git_obj then
-    vim.notify('File does not exist before this commit', vim.log.levels.WARN)
+    print('Empty git object')
     dprint('Empty git obj')
     return
   end
